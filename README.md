@@ -59,3 +59,4 @@ To treat the Android bridge as a local serial port (`/dev/rfcomm0`):
 ## Troubleshooting
 *   **Disconnections**: Ensure **Battery Optimization** is set to "Unrestricted" for this app and the system "Bluetooth" app.
 *   **Permissions**: If Linux returns "Permission Denied", add your user to the `dialout` group: `sudo usermod -aG dialout $USER`.
+*   **Flashing Images**: As the baud rate can only be adjusted in the app and not via RFCOMM, you can only flash images with the same baud rate as the bootloader's default baud rate (usually 115200 b/s).
