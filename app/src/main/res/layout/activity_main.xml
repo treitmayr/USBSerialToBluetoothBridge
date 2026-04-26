@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="USB Serial to Bluetooth Bridge"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="USB Status: " />
+        <TextView
+            android:id="@+id/usbStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disconnected"
+            android:textColor="#FF0000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bluetooth Status: " />
+        <TextView
+            android:id="@+id/btStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waiting for connection"
+            android:textColor="#FF0000" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnRefreshUsb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connect USB Device"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/btnMakeDiscoverable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Make Phone Discoverable (SPP)"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Serial Settings"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Baud Rate: "
+            android:layout_gravity="center_vertical" />
+        <Spinner
+            android:id="@+id/baudSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchDTR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="DTR"
+            android:paddingEnd="16dp" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchRTS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="RTS"
+            android:paddingEnd="16dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ESP32 Controls"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Reset"
+            android:layout_marginEnd="4dp" />
+        <Button
+            android:id="@+id/btnBootloader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Bootloader"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#222222"
+        android:padding="8dp">
+        <TextView
+            android:id="@+id/tvLog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:textColor="#00FF00"
+            android:text="App started\n" />
+    </ScrollView>
+
+</LinearLayout>
