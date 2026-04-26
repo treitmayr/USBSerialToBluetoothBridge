@@ -43,6 +43,12 @@ To treat the Android bridge as a local serial port (`/dev/rfcomm0`):
     ```bash
     sudo rfcomm bind 0 [PHONE_MAC] 1
     ```
+    Alternatively, you can use a script that tries to automatically detect the needed parameters:
+    ```bash
+    mac=$(bluetoothctl info | grep -oP '^Device\s+\K\S+|00001101-0000-1000-8000-00805f9b34fb' | grep -B1 00001101 | head -n 1)
+    channel=$(sdptool browse "$mac" | grep -oP '"Serial Port"|"RFCOMM"|Channel:\s+\K\d+' | grep -A2 '"Serial Port"' | grep -A1 '"RFCOMM"' | tail -n 1)
+    rfcomm connect 0 "$mac" "$channel" &
+    ```
 3.  **Access Serial**:
     Use any terminal emulator (e.g., `picocom -b 115200 /dev/rfcomm0` or `screen /dev/rfcomm0`).
 
