@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -46,15 +47,22 @@ public class BridgeService extends Service implements UsbSerialManager.Listener,
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Notification notification = getNotification("Bridge Service Running");
+        
+        final boolean hasPermission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) 
-                    == PackageManager.PERMISSION_GRANTED) {
-                startForeground(NOTIFICATION_ID, getNotification("Bridge Service Running"));
-            } else {
-                if (listener != null) listener.onLog("Notification permission missing, running without foreground notification");
-            }
+            hasPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) 
+                    == PackageManager.PERMISSION_GRANTED;
         } else {
-            startForeground(NOTIFICATION_ID, getNotification("Bridge Service Running"));
+            hasPermission = true;
+        }
+
+        if (hasPermission) {
+            // Android 14+ (API 34) requires service type if declared in manifest.
+            // Since minSdk is 29, we can always pass the type for better compliance.
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+        } else {
+            if (listener != null) listener.onLog("Notification permission missing, running without foreground notification");
         }
         bluetoothServer.start();
         return START_STICKY;
