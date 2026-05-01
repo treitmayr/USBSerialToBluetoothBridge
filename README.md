@@ -18,14 +18,21 @@ An Android application that bridges data between a USB-OTG serial adapter and a 
 
 ## Installation
 
-1.  Clone the repository.
-2.  Open in Android Studio or build via terminal:
+1.  **Download APK**: Go to the [Releases](https://github.com/OWNER/REPOSITORY/releases) page and download the latest `app-release.apk`.
+2.  **Manual Build** (Alternative):
     ```bash
     ./gradlew assembleDebug
     ```
-3.  Install the APK located at `app/build/outputs/apk/debug/app-debug.apk`.
+    Install the APK located at `app/build/outputs/apk/debug/app-debug.apk`.
 
-> **Note**: For production/release builds, you must configure a signing key in `app/build.gradle`.
+### Note for Developers (Releasing)
+
+To release a new version:
+1.  Tag your commit: `git tag v1.0.0`
+2.  Push the tag: `git push origin v1.0.0`
+3.  GitHub Actions will automatically build, sign, and publish the release.
+
+*Note: You must set up `SIGNING_KEY` (base64), `ALIAS`, `KEY_STORE_PASSWORD`, and `KEY_PASSWORD` as GitHub Secrets for the release to be signed.*
 
 ## Usage
 
