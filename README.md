@@ -2,7 +2,7 @@
 
 An Android application that bridges data between a USB-OTG serial adapter and a Bluetooth Classic (SPP) connection. Designed specifically for developers working with microcontrollers like the ESP32.
 
-<img src="assets/screenshot.jpg" alt="App Screenshot" width="300">
+<p align="center"><img src="assets/screenshot.jpg" alt="App Screenshot" width="300"></p>
 
 ## Features
 
