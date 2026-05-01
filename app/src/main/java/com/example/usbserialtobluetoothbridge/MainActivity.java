@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,6 +35,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         setupBaudSpinner();
         setupListeners();
         checkPermissions();
+        checkBatteryOptimization();
 
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -141,10 +146,43 @@ public class MainActivity extends AppCompatActivity {
         } else {
             registerReceiver(usbReceiver, filter);
         }
+    }
 
-        Intent intent = new Intent(this, BridgeService.class);
-        startService(intent);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    private void startBridgeServiceIfPermissionsGranted() {
+        if (isBound) return;
+        if (hasRequiredPermissions()) {
+            log("Starting Bridge Service...");
+            Intent intent = new Intent(this, BridgeService.class);
+            startService(intent);
+            bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        } else {
+            log("Waiting for permissions to start service...");
+        }
+    }
+
+    private boolean hasRequiredPermissions() {
+        List<String> permissions = getRequiredPermissions();
+        for (String p : permissions) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private List<String> getRequiredPermissions() {
+        List<String> permissions = new ArrayList<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
+            permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE);
+        } else {
+            permissions.add(Manifest.permission.BLUETOOTH);
+            permissions.add(Manifest.permission.BLUETOOTH_ADMIN);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+        return permissions;
     }
 
     private void setupBaudSpinner() {
@@ -281,21 +319,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPermissions() {
-        List<String> permissions = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
-            permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE);
-        } else {
-            permissions.add(Manifest.permission.BLUETOOTH);
-            permissions.add(Manifest.permission.BLUETOOTH_ADMIN);
-        }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
-        }
-
         List<String> toRequest = new ArrayList<>();
-        for (String p : permissions) {
+        for (String p : getRequiredPermissions()) {
             if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
                 toRequest.add(p);
             }
@@ -303,6 +328,23 @@ public class MainActivity extends AppCompatActivity {
 
         if (!toRequest.isEmpty()) {
             ActivityCompat.requestPermissions(this, toRequest.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        } else {
+            startBridgeServiceIfPermissionsGranted();
+        }
+    }
+
+    private void checkBatteryOptimization() {
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Battery Optimization")
+                .setMessage("To prevent the bridge service from being killed in the background, please set Battery Optimization to 'Unrestricted' in the next screen.")
+                .setPositiveButton("Settings", (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Later", null)
+                .show();
         }
     }
 
@@ -319,6 +361,7 @@ public class MainActivity extends AppCompatActivity {
             }
             if (allGranted) {
                 log("Permissions granted");
+                startBridgeServiceIfPermissionsGranted();
             } else {
                 log("Permissions denied");
                 Toast.makeText(this, "Permissions required for Bluetooth", Toast.LENGTH_LONG).show();

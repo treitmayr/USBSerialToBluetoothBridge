@@ -4,7 +4,12 @@ import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +29,7 @@ public class BluetoothServer {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private final BluetoothAdapter bluetoothAdapter;
+    private final Context context;
     private final Listener listener;
     private AcceptThread acceptThread;
     private ConnectedThread connectedThread;
@@ -32,12 +38,21 @@ public class BluetoothServer {
         if (listener != null) listener.onBluetoothError(message);
     }
 
-    public BluetoothServer(Listener listener) {
+    public BluetoothServer(Context context, Listener listener) {
+        this.context = context;
         this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         this.listener = listener;
     }
 
     public synchronized void start() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) 
+                    != PackageManager.PERMISSION_GRANTED) {
+                log("Missing BLUETOOTH_CONNECT permission");
+                return;
+            }
+        }
+
         if (connectedThread != null) {
             connectedThread.cancel();
             connectedThread = null;

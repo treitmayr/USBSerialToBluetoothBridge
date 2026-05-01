@@ -5,12 +5,15 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 public class BridgeService extends Service implements UsbSerialManager.Listener, BluetoothServer.Listener {
 
@@ -38,12 +41,21 @@ public class BridgeService extends Service implements UsbSerialManager.Listener,
         super.onCreate();
         createNotificationChannel();
         usbSerialManager = new UsbSerialManager(this, this);
-        bluetoothServer = new BluetoothServer(this);
+        bluetoothServer = new BluetoothServer(this, this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIFICATION_ID, getNotification("Bridge Service Running"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) 
+                    == PackageManager.PERMISSION_GRANTED) {
+                startForeground(NOTIFICATION_ID, getNotification("Bridge Service Running"));
+            } else {
+                if (listener != null) listener.onLog("Notification permission missing, running without foreground notification");
+            }
+        } else {
+            startForeground(NOTIFICATION_ID, getNotification("Bridge Service Running"));
+        }
         bluetoothServer.start();
         return START_STICKY;
     }
