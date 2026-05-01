@@ -2,6 +2,8 @@
 
 An Android application that bridges data between a USB-OTG serial adapter and a Bluetooth Classic (SPP) connection. Designed specifically for developers working with microcontrollers like the ESP32.
 
+![App Screenshot](assets/screenshot.jpg)
+
 ## Features
 
 *   **Bidirectional Bridging**: Transparent data relay between USB and Bluetooth.
@@ -18,7 +20,7 @@ An Android application that bridges data between a USB-OTG serial adapter and a 
 
 ## Installation
 
-1.  **Download APK**: Go to the [Releases](https://github.com/OWNER/REPOSITORY/releases) page and download the latest `app-release.apk`.
+1.  **Download APK**: Go to the [Releases](/treitmayr/USBSerialToBluetoothBridge/releases/) page and download the latest `app-release.apk`.
 2.  **Manual Build** (Alternative):
     ```bash
     ./gradlew assembleDebug
